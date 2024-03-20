@@ -20,7 +20,10 @@ export async function redirectToAuthCodeFlow(clientId: string) {
   params.append("client_id", clientId);
   params.append("response_type", "code");
   params.append("redirect_uri", "http://localhost:5173/callback");
-  params.append("scope", "user-read-private user-read-email");
+  params.append(
+    "scope",
+    "user-read-private user-read-email user-read-currently-playing "
+  );
   params.append("code_challenge_method", "S256");
   params.append("code_challenge", challenge);
 
@@ -47,10 +50,10 @@ async function generateCodeChallenge(codeVerifier: string) {
     .replace(/=+$/, "");
 }
 
-export async function getAccessToken(
+export async function generateAndSetAccessToken(
   clientId: string,
   code: string
-): Promise<string> {
+): Promise<void> {
   const verifier = localStorage.getItem("verifier");
 
   const params = new URLSearchParams();
@@ -59,15 +62,17 @@ export async function getAccessToken(
   params.append("code", code);
   params.append("redirect_uri", "http://localhost:5173/callback");
   params.append("code_verifier", verifier!);
+  console.log(params.toString());
 
   const result = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: params,
   });
-
-  const { access_token } = await result.json();
-  return access_token;
+  const { access_token, refresh_token } = await result.json();
+  localStorage.setItem("accessToken", access_token);
+  localStorage.setItem("refreshToken", refresh_token);
+  localStorage.setItem("fetchDataExecuted", "true"); // Set flag indicating execution
 }
 
 export async function fetchProfile(token: string): Promise<any> {
@@ -75,7 +80,7 @@ export async function fetchProfile(token: string): Promise<any> {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
-
+console.log(result);
   return await result.json();
 }
 
@@ -87,6 +92,11 @@ export async function fetchTrack(token: string): Promise<any> {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+
+  if (result.status === 204) {
+    // If the response status is 204, return a message indicating no track is currently playing
+    return { message: "No track is currently playing." };
+  }
 
   return await result.json();
 }

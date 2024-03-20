@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { getAccessToken, fetchProfile, redirectToAuthCodeFlow } from "./script";
 
 const clientId = "cbc775e0c34c4ae79e5bf7896ea19d75"; // Replace with your client id
 
