@@ -8,7 +8,7 @@ export default function ProfileComponent({profile}) {
     <div>
       {profile && (
         <>
-          <div>Display Name: {profile.display_name}</div>
+          <div className="profile">Display Name: {profile.display_name}</div>
           {profile.images[0] && (
             <img
               src={profile.images[0].url}
@@ -24,9 +24,6 @@ export default function ProfileComponent({profile}) {
           </div>
           <div>
             URL: <a href={profile.href}>{profile.href}</a>
-          </div>
-          <div>
-            Profile Image URL: {profile.images[0]?.url ?? "(no profile image)"}
           </div>
         </>
       )}
