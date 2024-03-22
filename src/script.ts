@@ -1,16 +1,26 @@
-// const clientId = "cbc775e0c34c4ae79e5bf7896ea19d75"; // Replace with your client id
+const clientId = "cbc775e0c34c4ae79e5bf7896ea19d75";
 const params = new URLSearchParams(window.location.search);
-// const code = params.get("code");
+const code = params.get("code");
 
-// if (!code) {
-//   redirectToAuthCodeFlow(clientId);
-// } else {
-//   const accessToken = await getAccessToken(clientId, code);
-//   const profile = await fetchProfile(accessToken);
-//   populateUI(profile);
-// }
+const fetchDataExecuted = localStorage.getItem("fetchDataExecuted");
+if (!fetchDataExecuted) {
+  await setupTokens();
+}
 
-export async function redirectToAuthCodeFlow(clientId: string) {
+ async function setupTokens() {
+  if (code) {
+    try {
+      await generateAndSetAccessToken(clientId, code);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  } else {
+    redirectToAuthCodeFlow(clientId);
+  }
+}
+
+
+ async function redirectToAuthCodeFlow(clientId: string) {
   const verifier = generateCodeVerifier(128);
   const challenge = await generateCodeChallenge(verifier);
 
@@ -50,7 +60,7 @@ async function generateCodeChallenge(codeVerifier: string) {
     .replace(/=+$/, "");
 }
 
-export async function generateAndSetAccessToken(
+ async function generateAndSetAccessToken(
   clientId: string,
   code: string
 ): Promise<void> {
@@ -74,31 +84,5 @@ export async function generateAndSetAccessToken(
   localStorage.setItem("refreshToken", refresh_token);
   localStorage.setItem("fetchDataExecuted", "true"); // Set flag indicating execution
 }
-
-export async function fetchProfile(token: string): Promise<any> {
-  const result = await fetch("https://api.spotify.com/v1/me", {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-console.log(result);
-  return await result.json();
-}
-
-export async function fetchTrack(token: string): Promise<any> {
-  const result = await fetch(
-    "https://api.spotify.com/v1/me/player/currently-playing",
-    {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-
-  if (result.status === 204) {
-    // If the response status is 204, return a message indicating no track is currently playing
-    return { message: "No track is currently playing." };
-  }
-
-  return await result.json();
-}
-
+export { };
 
