@@ -19,5 +19,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/App.jsx"]
+  "include": ["src", "src/Components/App.jsx"]
 }

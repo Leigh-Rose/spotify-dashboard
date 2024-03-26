@@ -18,6 +18,6 @@ export async function getRefreshToken() {
   const body = await fetch(url, payload);
   const response = await body.json();
 
-  localStorage.setItem("access_token", response.accessToken);
-  localStorage.setItem("refresh_token", response.refreshToken);
+  localStorage.setItem("accessToken", response.accessToken);
+  localStorage.setItem("refreshToken", response.refreshToken);
 }
